@@ -91,10 +91,16 @@ class WemoSwitch(SwitchDevice):
 
     def _update_callback(self, _device, _params):
         """ Called by the wemo device callback to update state. """
-        _LOGGER.info(
+        _LOGGER.error(
             'Subscription update for  %s',
             _device)
+
+        _LOGGER.error("state before update is %s", self.wemo.get_state())
+        import pdb; pdb.set_trace()
+
         self.update_ha_state(True)
+        _LOGGER.error("state after update is  %s", self.wemo.get_state())
+        _LOGGER.error("fetched state is  %s", self.wemo.get_state(True))
 
     @property
     def should_poll(self):
