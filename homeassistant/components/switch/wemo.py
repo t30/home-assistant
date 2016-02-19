@@ -96,6 +96,7 @@ class WemoSwitch(SwitchDevice):
             _device)
         _LOGGER.error("state before sleep is %s", self.wemo.get_state(True))
         time.sleep(5)
+        import pdb; pdb.set_trace()
         _LOGGER.error("state before update is %s", self.wemo.get_state(True))
 
         self.update_ha_state(True)
