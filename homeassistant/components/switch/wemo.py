@@ -7,6 +7,7 @@ For more details about this component, please refer to the documentation at
 https://home-assistant.io/components/switch.wemo/
 """
 import logging
+import time
 
 from homeassistant.components.switch import SwitchDevice
 from homeassistant.const import (
@@ -93,8 +94,9 @@ class WemoSwitch(SwitchDevice):
         _LOGGER.error(
             'Subscription update for  %s',
             _device)
-
-        _LOGGER.error("state before update is %s", self.wemo.get_state())
+        _LOGGER.error("state before sleep is %s", self.wemo.get_state(True))
+        time.sleep(5)
+        _LOGGER.error("state before update is %s", self.wemo.get_state(True))
 
         self.update_ha_state(True)
         _LOGGER.error("state after update is  %s", self.wemo.get_state())
