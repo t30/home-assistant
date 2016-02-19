@@ -68,7 +68,7 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
 
     # Filter out the switches and wrap in WemoSwitch object
     add_devices_callback(
-        [WemoSwitch(switch) for switch in switches
+        [WemoSwitch(switch) for switch in switches])
 
     # Add manually-defined wemo devices
     if discovery_info is None and 'static' in config:
@@ -95,7 +95,6 @@ class WemoSwitch(SwitchDevice):
             _device)
 
         _LOGGER.error("state before update is %s", self.wemo.get_state())
-        import pdb; pdb.set_trace()
 
         self.update_ha_state(True)
         _LOGGER.error("state after update is  %s", self.wemo.get_state())
@@ -141,9 +140,12 @@ class WemoSwitch(SwitchDevice):
         """ Returns the state. """
         is_on = self.is_on
         if not is_on:
+            _LOGGER.warning('State: state for  %s = %s', self.name, STATE_OFF)
             return STATE_OFF
         elif self.is_standby:
+            _LOGGER.warning('State: state for  %s = %s', self.name, STATE_STANDBY)
             return STATE_STANDBY
+        _LOGGER.warning('State: state for  %s = %s', self.name, STATE_ON)
         return STATE_ON
 
     @property
@@ -173,6 +175,7 @@ class WemoSwitch(SwitchDevice):
     @property
     def is_on(self):
         """ True if switch is on. """
+        _LOGGER.warning('is_on: for  %s = %s', self.name, self.wemo.get_state())
         return self.wemo.get_state()
 
     @property
@@ -198,7 +201,8 @@ class WemoSwitch(SwitchDevice):
     def update(self):
         """ Update WeMo state. """
         try:
-            self.wemo.get_state(True)
+            ret = self.wemo.get_state(True)
+            _LOGGER.warning('Update: status for  %s = %s', self.name, ret)
             if self.wemo.model_name == 'Insight':
                 self.insight_params = self.wemo.insight_params
                 self.insight_params['standby_state'] = (
