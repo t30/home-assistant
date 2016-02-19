@@ -69,7 +69,6 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
     # Filter out the switches and wrap in WemoSwitch object
     add_devices_callback(
         [WemoSwitch(switch) for switch in switches
-         if isinstance(switch, pywemo.Switch)])
 
     # Add manually-defined wemo devices
     if discovery_info is None and 'static' in config:
