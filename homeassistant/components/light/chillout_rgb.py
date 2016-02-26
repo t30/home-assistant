@@ -10,8 +10,9 @@ import urllib.request
 #import urllib.parse
 
 from homeassistant.components.light import (
-#    ATTR_BRIGHTNESS, ATTR_COLOR_TEMP, ATTR_RGB_COLOR, Light)
-    ATTR_BRIGHTNESS, ATTR_RGB_COLOR, Light)
+#    ATTR_BRIGHTNESS, ATTR_RGB_COLOR, Light)
+    ATTR_BRIGHTNESS, ATTR_RGB_COLOR, ATTR_EFFECT,
+    EFFECT_COLORLOOP, EFFECT_RANDOM, Light)
 
 LIGHT_COLORS = [
     [237, 224, 33],
@@ -94,26 +95,31 @@ class ChillOutLight(Light):
         group_dest = "%0.1X" % self._groupid
         device_dest = "%0.2X" % self._devid
 
+        if kwargs:
+            string_command = 'null'
+
         if ATTR_RGB_COLOR in kwargs:
             self._rgb = kwargs[ATTR_RGB_COLOR]
-            self._brightness = 0
-
-            rr = "%0.2x" % self._rgb[0]
-            gg = "%0.2x" % self._rgb[1]
-            bb = "%0.2x" % self._rgb[2]
-            string_command = 'rgb_'+rr+gg+bb+group_dest+device_dest
+#            self._brightness = 0
 
         if ATTR_BRIGHTNESS in kwargs:
             self._brightness = kwargs[ATTR_BRIGHTNESS]
             self._rgb = [ kwargs[ATTR_BRIGHTNESS], kwargs[ATTR_BRIGHTNESS], kwargs[ATTR_BRIGHTNESS] ]
 
+        if ATTR_RGB_COLOR in kwargs or ATTR_BRIGHTNESS in kwargs:
+            _LOGGER.info('ChillOut RGB System - RGB or BRIGHT %s', kwargs)
+
             rr = "%0.2x" % self._rgb[0]
             gg = "%0.2x" % self._rgb[1]
             bb = "%0.2x" % self._rgb[2]
             string_command = 'rgb_'+rr+gg+bb+group_dest+device_dest
 
-        if (ATTR_RGB_COLOR or ATTR_BRIGHTNESS) in kwargs:
-            _LOGGER.info('ChillOut RGB System - RGB or BRIGHT %s', kwargs)
+        if ATTR_EFFECT in kwargs:
+            effect = kwargs.get(ATTR_EFFECT)
+            if effect == EFFECT_COLORLOOP:
+                string_command = 'prg_C00000'+group_dest+device_dest
+            elif effect == EFFECT_RANDOM:
+                string_command = 'prg_R00000'+group_dest+device_dest
 
         if all(rgb == self._rgb[0] for rgb in self._rgb):
             self._brightness = self._rgb[0]
