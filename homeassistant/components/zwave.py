@@ -35,11 +35,13 @@ SERVICE_ADD_NODE = "add_node"
 SERVICE_REMOVE_NODE = "remove_node"
 SERVICE_HEAL_NETWORK = "heal_network"
 SERVICE_SOFT_RESET = "soft_reset"
+SERVICE_TEST_NETWORK = "test_network"
 
 DISCOVER_SENSORS = "zwave.sensors"
 DISCOVER_SWITCHES = "zwave.switch"
 DISCOVER_LIGHTS = "zwave.light"
 DISCOVER_BINARY_SENSORS = 'zwave.binary_sensor'
+DISCOVER_THERMOSTATS = 'zwave.thermostat'
 
 EVENT_SCENE_ACTIVATED = "zwave.scene_activated"
 
@@ -51,6 +53,7 @@ COMMAND_CLASS_SENSOR_MULTILEVEL = 49
 COMMAND_CLASS_METER = 50
 COMMAND_CLASS_BATTERY = 128
 COMMAND_CLASS_ALARM = 113  # 0x71
+COMMAND_CLASS_THERMOSTAT_MODE = 64  # 0x40
 
 GENRE_WHATEVER = None
 GENRE_USER = "User"
@@ -85,7 +88,12 @@ DISCOVERY_COMPONENTS = [
      DISCOVER_BINARY_SENSORS,
      [COMMAND_CLASS_SENSOR_BINARY],
      TYPE_BOOL,
-     GENRE_USER)
+     GENRE_USER),
+    ('thermostat',
+     DISCOVER_THERMOSTATS,
+     [COMMAND_CLASS_THERMOSTAT_MODE],
+     TYPE_WHATEVER,
+     GENRE_WHATEVER),
 ]
 
 
@@ -269,6 +277,10 @@ def setup(hass, config):
         """Soft reset the controller."""
         NETWORK.controller.soft_reset()
 
+    def test_network(event):
+        """Test the network by sending commands to all the nodes."""
+        NETWORK.test()
+
     def stop_zwave(event):
         """Stop Z-Wave."""
         NETWORK.stop()
@@ -310,6 +322,7 @@ def setup(hass, config):
         hass.services.register(DOMAIN, SERVICE_REMOVE_NODE, remove_node)
         hass.services.register(DOMAIN, SERVICE_HEAL_NETWORK, heal_network)
         hass.services.register(DOMAIN, SERVICE_SOFT_RESET, soft_reset)
+        hass.services.register(DOMAIN, SERVICE_TEST_NETWORK, test_network)
 
     hass.bus.listen_once(EVENT_HOMEASSISTANT_START, start_zwave)
 
